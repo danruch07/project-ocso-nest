@@ -2,54 +2,46 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { v4 as uuid } from 'uuid';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Employee } from './entities/employee.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class EmployeesService {
-  private employees: CreateEmployeeDto[] = [
-    {id: uuid(),
-     name: 'Daniel', 
-     lastName: 'Ruiz', 
-     phoneNumber: '123456789' },
+  constructor(@InjectRepository(Employee)
+private employeeRepository: Repository<Employee> ) 
+{}
 
-    {id: uuid(),
-     name: 'Julio', 
-     lastName: 'Albert0', 
-     phoneNumber: '987654321' },
-  ];
-  create(createEmployeeDto: CreateEmployeeDto) {
-    createEmployeeDto.id = uuid();
-  this.employees.push(createEmployeeDto);
-  return this.employees;    
+  async create(createEmployeeDto: CreateEmployeeDto) {
+    const employee = await this.employeeRepository.save(createEmployeeDto)
+    return employee;
 }
 
   findAll() {
-    return this.employees;
+    return this.employeeRepository.find()
   }
 
-  findOne(id: string) {
-    const employee = this.employees.filter((employee) => employee.id === id)[0];
-    if(!employee) throw new NotFoundException();
+  async findOne(id: string) {
+    const employee = await this.employeeRepository.findOneBy({ employeeId: id });
     return employee;
-    }
+  }
 
-  update(id: string, updateEmployeeDto: UpdateEmployeeDto) {
-    let employeeToUpdate = this.findOne(id);
-    employeeToUpdate = {
-      ...employeeToUpdate,
-      ...updateEmployeeDto,
-    }
-    this.employees = this.employees.map((employee) =>{
-      if(employee.id === id) {
-        employee = employeeToUpdate;
-      }
-      return employee;
-    }) 
-    return employeeToUpdate;
-    }
+  async update(id: string, updateEmployeeDto: UpdateEmployeeDto) {
+    const employeeToUpdate = await this.employeeRepository.preload({
+      employeeId: id,
+      ...updateEmployeeDto
+    });
+    if(!employeeToUpdate) throw new NotFoundException();
+    this.employeeRepository.save(employeeToUpdate);
+    return employeeToUpdate; 
+  }
 
-  remove(id: string) {
-    this.findOne(id);
-    this.employees = this.employees.filter((employee) => employee.id !== id);
-    return this.employees;
+  async remove(id: string) {
+    const employee = await this.findOne(id);
+    if(!employee) {
+      throw new NotFoundException(`Employee con id ${id} no encontrado`)
     }
+    await this.employeeRepository.delete(id)
+    return {message: `Employee con id ${id} eliminado`}
+  }
 }

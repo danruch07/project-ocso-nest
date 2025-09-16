@@ -5,6 +5,7 @@ import { v4 as uuid } from 'uuid';
 import { Product } from './entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 
 @Injectable()
 export class ProductsService {
@@ -65,10 +66,13 @@ export class ProductsService {
     }
 
   async remove(id: string) {
-    this.findOne(id);
-    this.productRepository.delete(id);
+    const product = await this.findOne(id);
+    if (!product ) {
+      throw new NotFoundException(`No se encontró el objeto con id ${id}`);
+    }
+    await this.productRepository.delete(id);
     return {
       message: `Objeto con id ${id} eliminado`
-    }
-    }
+    };
+  }
 }
