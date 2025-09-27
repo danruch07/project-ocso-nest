@@ -27,13 +27,15 @@ export class LocationsService {
     if(!location) throw new NotFoundException("Location not found")
   }
 
-  update(id: number, updateLocationDto: UpdateLocationDto) {
-    const location = this.locationsRepository.preload
-    ({
+  async update(id: number, updateLocationDto: UpdateLocationDto) {
+    const location = await this.locationsRepository.preload({
       locationId: id,
       ...updateLocationDto
-    })
-    return location
+    });
+    if (!location) {
+      throw new NotFoundException(`Location with id ${id} not found`);
+    }
+    return this.locationsRepository.save(location);
   }
 
   remove(id: number) {
