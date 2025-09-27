@@ -1,5 +1,7 @@
 import { text } from 'node:stream/consumers';
-import { Entity, Column, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Provider } from 'src/providers/entities/provider.entity';
+import e from 'express';
 
 @Entity()
 export class Product {
@@ -11,6 +13,8 @@ export class Product {
     price: number;
     @Column({ type: "int" })
     countSeal: number;
-    //@Column({ type: 'uuid'})
-    //provider: string;
+    @ManyToOne(() => Provider, (provider) => provider.products,{
+        ///eager: true
+    })
+    provider: Provider;
 }

@@ -1,18 +1,19 @@
 import { IsInt, IsOptional, IsUUID, IsNumber, MaxLength, IsString } from "class-validator";
+import { Product } from "../entities/product.entity";
+import { Provider } from "src/providers/entities/provider.entity";
 
-export class CreateProductDto {
+export class CreateProductDto extends Product {
     @IsUUID ("4")
     @IsOptional()
-    productId: string;
+    declare productId: string;
     @IsString()
     @MaxLength(40)
-    productName: string;
+    declare productName: string;
     @IsNumber()
-    price: number;
+    declare price: number;
     @IsInt()
-    countSeal: number;
+    declare countSeal: number;
     @IsString()
     @IsUUID()
-    @IsOptional()
-    provider: string;
+    declare provider: Provider;
 }
