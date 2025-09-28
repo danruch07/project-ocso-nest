@@ -1,6 +1,7 @@
 import { IsOptional } from 'class-validator';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Location } from 'src/locations/entities/location.entity';
+import { User } from 'src/auth/entities/user.entity';
 
 @Entity()
 export class Employee {
@@ -23,5 +24,11 @@ export class Employee {
         name: 'locationId'
     })
     location: Location[];
+
+    @OneToOne(() => User)
+    @JoinColumn({
+        name: "UserId"
+    })
+    user:User
 
 }
