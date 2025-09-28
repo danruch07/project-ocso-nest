@@ -7,9 +7,7 @@ import { PrimaryGeneratedColumn } from "typeorm";
 export class User { 
     @PrimaryGeneratedColumn('uuid')
     userId: string;
-    @Column('text',{
-        unique: true,
-    })
+    @Column('text')
     userEmail: string
     @Column('text')
     userPassword: string
