@@ -9,8 +9,8 @@ import { User } from 'src/auth/entities/user.entity';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Admin } from 'typeorm';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Auth } from 'src/auth/decorators/auth.decorator';
 
-@UseGuards(AuthGuard)
 @Controller('providers')
 export class ProvidersController {
   constructor(private readonly providersService: ProvidersService) {}
@@ -20,8 +20,7 @@ export class ProvidersController {
     return this.providersService.create(createProviderDto);
   }
 
-  @Roles(["Admin"])
-  @UseGuards(RolesGuard)
+  @Auth("Employee")
   @Get()
   findAll(@UserData() user:User) {
     if(user.userRoles.includes("Employee"))throw new UnauthorizedException("No estas autorizado, solo admis y managers");
